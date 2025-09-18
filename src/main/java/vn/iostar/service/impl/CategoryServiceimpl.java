@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import ch.qos.logback.core.util.StringUtil;
 import vn.iostar.entity.Category;
 import vn.iostar.repository.CategoryRepository;
 import vn.iostar.service.CategoryService;
@@ -24,7 +25,20 @@ public class CategoryServiceimpl implements CategoryService{
 
 	@Override
 	public <S extends Category> S save(S entity) {
-		
+		if (entity.getId() == null) {
+			return categoryRepository.save(entity);
+		}	
+		else {
+			Optional<Category> opt = findById(entity.getId());
+			if (opt.isPresent()) {
+				if (StringUtil.isNullOrEmpty(entity.getName())) {
+					entity.setName(opt.get().getName());
+				}
+				else {
+					entity.setName(entity.getName());
+				}
+			}
+		}
 		return categoryRepository.save(entity);
 	}
 
