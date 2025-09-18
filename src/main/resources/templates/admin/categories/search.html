@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout_admin.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Categories</title>
+    <style>
+        .alert { margin-bottom: 0; }
+    </style>
+</head>
+
+<body>
+<section class="row" layout:fragment="content">
+    <div class="col-6 offset-3 mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Search Categories</h2>
+            </div>
+            <div class="card-body">
+                <!-- Message Display -->
+                <div th:if="${message != null}" class="alert alert-primary" role="alert">
+                    [[${message}]]
+                </div>
+
+                <!-- Search Form -->
+                <form th:action="@{/admin/categories/searchpaginated}" method="get" class="input-group">
+                    <input type="text" class="form-control" name="name" placeholder="Enter category name to search" />
+                    <button class="btn btn-outline-primary">Search</button>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <a th:href="@{/admin/categories}" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,41 +1,40 @@
 package vn.iostar.service;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import vn.iostar.entity.Category;
 
 public interface CategoryService {
 
-	void deleteAll();
+    void deleteAll();
 
-	void delete(Category entity);
+    void delete(Category entity);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 
-	long count();
+    long count();
 
-	Optional<Category> findById(Long id);
+    Optional<Category> findById(Long id);
 
-	List<Category> findAllById(Iterable<Long> ids);
+    List<Category> findAllById(Iterable<Long> ids);
 
-	List<Category> findAll();
+    List<Category> findAll();
 
-	Page<Category> findAll(org.springframework.data.domain.Pageable pageable);
+    Page<Category> findAll(Pageable pageable);
 
-	List<Category> findAll(Sort sort);
+    List<Category> findAll(Sort sort);
 
-	<S extends Category> Optional<S> findOne(Example<S> example);
+    <S extends Category> Optional<S> findOne(Example<S> example);
 
-	List<Category> findByNameContaining(String name, Pageable Pageable);
+    List<Category> findByNameContaining(String name);
 
-	List<Category> findByNameContaining(String name);
+    Page<Category> findByNameContaining(String name, Pageable pageable);
 
-	<S extends Category> S save(S entity);
-
+    <S extends Category> S save(S entity);
 }
