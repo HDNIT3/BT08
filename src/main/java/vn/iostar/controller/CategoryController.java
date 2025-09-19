@@ -37,7 +37,7 @@ public class CategoryController {
 	@GetMapping("")
 	public String list(ModelMap model) {
 		model.addAttribute("categories", cateSer.findAll());
-		return "admin/category/list";
+		return "admin/list";
 	}
 
 	// Trang thêm mới danh mục
@@ -49,20 +49,24 @@ public class CategoryController {
 		return "admin/categories/addOrEdit";
 	}
 
-	// Lưu hoặc cập nhật danh mục
 	@PostMapping("saveOrUpdate")
 	public ModelAndView saveOrUpdate(Model model, @Validated @ModelAttribute("category") CategoryModel cateModel,
-			BindingResult result) {
-		if (result.hasErrors()) {
-			return new ModelAndView("admin/categories/addOrEdit");
-		}
+	        BindingResult result) {
+	    if (result.hasErrors()) {
+	        return new ModelAndView("admin/categories/addOrEdit");
+	    }
 
-		Category category = new Category();
-		BeanUtils.copyProperties(cateModel, category);
-		cateSer.save(category);
-		String message = cateModel.getEdit() ? "Chỉnh Sửa thành công!" : "Lưu thành công!";
-		model.addAttribute("message", message);
-		return new ModelAndView("redirect:/admin/categories/searchpaginated");
+	    if (cateModel == null) {
+	        model.addAttribute("message", "Danh mục không hợp lệ!");
+	        return new ModelAndView("admin/categories/addOrEdit");
+	    }
+
+	    Category category = new Category();
+	    BeanUtils.copyProperties(cateModel, category);
+	    cateSer.save(category);
+	    String message = cateModel.getEdit() ? "Chỉnh sửa thành công!" : "Lưu thành công!";
+	    model.addAttribute("message", message);
+	    return new ModelAndView("redirect:/admin/categories/searchpaginated");
 	}
 
 	// Trang chỉnh sửa danh mục
@@ -85,34 +89,34 @@ public class CategoryController {
 
 	@RequestMapping("/searchpaginated")
 	public String search(ModelMap model, @RequestParam(name = "name", required = false) String name,
-			@RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size) {
+	        @RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size) {
 
-		int currentPage = page.orElse(1);
-		int pageSize = size.orElse(5);
+	    int currentPage = page.orElse(1);
+	    int pageSize = size.orElse(5);
 
-		Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+	    Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
 
-		Page<Category> categoryPage;
+	    Page<Category> categoryPage;
 
-		if (name != null && !name.isEmpty()) {
-			categoryPage = cateSer.findByNameContaining(name, pageable);
-		} else {
-			categoryPage = cateSer.findAll(pageable);
-		}
+	    if (StringUtils.hasText(name)) {
+	        categoryPage = cateSer.findByNameContaining(name, pageable);
+	    } else {
+	        categoryPage = cateSer.findAll(pageable);
+	    }
 
-		int totalPages = categoryPage.getTotalPages();
-		List<Integer> pageNumbers = new ArrayList<>();
-		if (totalPages > 0) {
-			for (int i = 1; i <= totalPages; i++) {
-				pageNumbers.add(i);
-			}
-		}
+	    int totalPages = categoryPage.getTotalPages();
+	    List<Integer> pageNumbers = new ArrayList<>();
+	    if (totalPages > 0) {
+	        for (int i = 1; i <= totalPages; i++) {
+	            pageNumbers.add(i);
+	        }
+	    }
 
-		model.addAttribute("categoryPage", categoryPage);
-		model.addAttribute("pageNumbers", pageNumbers);
-		model.addAttribute("name", name);
+	    model.addAttribute("categoryPage", categoryPage);
+	    model.addAttribute("pageNumbers", pageNumbers);
+	    model.addAttribute("name", name);
 
-		return "admin/category/searchpaging";
+	    return "admin/categories/searchpaging";
 	}
 
 	@GetMapping("/delete/{id}")
