@@ -12,6 +12,7 @@
     </style>
 </head>
 <body>
+    <!-- Khi không có dữ liệu -->
     <div th:if="${!categoryPage.hasContent()}" class="card">
         <div class="card-header">List Category</div>
         <div class="card-body">
@@ -21,9 +22,10 @@
             <div class="row mb-2">
                 <div class="col-md-6">
                     <form th:action="@{/admin/categories/searchpaginated}" method="get" class="input-group">
-                        <input type="text" class="form-control ml-2" name="name" th:placeholder="Nhập từ khóa để tìm" />
+                        <input type="text" class="form-control ml-2" name="name"
+                               th:placeholder="'Nhập từ khóa để tìm'" th:value="${name}" />
                         <button class="btn btn-outline-primary ml-2">Search</button>
-                    </div>
+                    </form>
                 </div>
                 <div class="col-md-6 float-right">
                     <a th:href="@{/admin/categories/add}" class="btn btn-outline-success">Add New Category</a>
@@ -33,15 +35,17 @@
         </div>
     </div>
 
+    <!-- Khi có dữ liệu -->
     <div th:if="${categoryPage.hasContent()}" class="card">
         <div class="card-header">List Category</div>
         <div class="card-body">
             <div class="row mb-2">
                 <div class="col-md-6">
                     <form th:action="@{/admin/categories/searchpaginated}" method="get" class="input-group">
-                        <input type="text" class="form-control ml-2" name="name" th:placeholder="Nhập từ khóa để tìm" />
+                        <input type="text" class="form-control ml-2" name="name"
+                               th:placeholder="'Nhập từ khóa để tìm'" th:value="${name}" />
                         <button class="btn btn-outline-primary ml-2">Search</button>
-                    </div>
+                    </form>
                 </div>
                 <div class="col-md-6 float-right">
                     <a th:href="@{/admin/categories/add}" class="btn btn-outline-success">Add New Category</a>
@@ -56,14 +60,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="category, stat : ${categoryPage.content}">
+                    <tr th:each="category : ${categoryPage.content}">
                         <td th:text="${category.id}"></td>
                         <td th:text="${category.name}"></td>
                         <td>
-                            <a th:href="@{/admin/categories/edit(id=${category.id})}" class="btn btn-outline-warning" data-id="${category.categoryId}" data-name="${category.name}">
+                            <a th:href="@{/admin/categories/edit(id=${category.id})}" 
+                               class="btn btn-outline-warning">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a th:href="@{/admin/categories/delete(id=${category.id})}" class="btn btn-outline-danger" onclick="showconfirmation(this.getAttribute('data-id'), this.getAttribute('data-name'))">
+                            <a href="#" class="btn btn-outline-danger"
+                               th:attr="data-id=${category.id}, data-name=${category.name}"
+                               onclick="showconfirmation(this.getAttribute('data-id'), this.getAttribute('data-name'))">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </td>
@@ -73,11 +80,13 @@
         </div>
     </div>
 
-    <div class="card-footer text-muted">
+    <!-- Footer phân trang + chọn size -->
+    <div class="card-footer text-muted" th:if="${categoryPage.hasContent()}">
         <div class="row">
             <div class="col-3">
-                <form action="#" th:action="@{/admin/categories/searchpaginated}" method="get" class="mb-3 input-group float-left">
-                    <select class="form-select ml-2" name="size" aria-label="size" onchange="this.form.submit()">
+                <form th:action="@{/admin/categories/searchpaginated}" method="get" class="mb-3 input-group float-left">
+                    <input type="hidden" name="name" th:value="${name}">
+                    <select class="form-select ml-2" name="size" onchange="this.form.submit()">
                         <option th:selected="${categoryPage.size == 5}" value="5">5</option>
                         <option th:selected="${categoryPage.size == 10}" value="10">10</option>
                         <option th:selected="${categoryPage.size == 15}" value="15">15</option>
@@ -88,17 +97,21 @@
             <div class="col-7">
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
-                        <li th:class="${categoryPage.number + 1} == 1 ? 'page-item active' : 'page-item'">
-                            <a th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=1)}" class="page-link">First</a>
+                        <!-- First -->
+                        <li class="page-item">
+                            <a th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=1)}"
+                               class="page-link">First</a>
                         </li>
-                        <li th:each="pageNumber : ${pageNumbers}">
-                            <a th:if="${pageNumber == categoryPage.number}" th:class="'page-item active'" th:text="${pageNumber}" 
-                               th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=${pageNumber})}" class="page-link"></a>
-                            <a th:unless="${pageNumber == categoryPage.number}" th:text="${pageNumber}" 
-                               th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=${pageNumber})}" class="page-link"></a>
+                        <!-- Numbered pages -->
+                        <li th:each="pageNumber : ${pageNumbers}"
+                            th:class="${pageNumber == categoryPage.number + 1} ? 'page-item active' : 'page-item'">
+                            <a th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=${pageNumber})}"
+                               th:text="${pageNumber}" class="page-link"></a>
                         </li>
-                        <li th:class="${categoryPage.totalPages == categoryPage.number + 1} ? 'page-item active' : 'page-item'">
-                            <a th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=${categoryPage.totalPages})}" class="page-link">Last</a>
+                        <!-- Last -->
+                        <li class="page-item">
+                            <a th:href="@{/admin/categories/searchpaginated(name=${name},size=${categoryPage.size},page=${categoryPage.totalPages})}"
+                               class="page-link">Last</a>
                         </li>
                     </ul>
                 </nav>
@@ -108,9 +121,9 @@
 
     <script type="text/javascript">
         function showconfirmation(id, name) {
-            $('#productName').text(name);
-            $('#yesoption').attr('href', '/admin/categories/delete/' + id);
-            $('#confirmationId').modal('show');
+            if (confirm("Bạn có chắc chắn muốn xóa: " + name + "?")) {
+                window.location.href = '/admin/categories/delete?id=' + id;
+            }
         }
     </script>
 </body>

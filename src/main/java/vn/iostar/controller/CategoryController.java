@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,15 +85,13 @@ public class CategoryController {
 		return new ModelAndView("forward:/admin/categories/searchpaginated", model);
 	}
 
-	@RequestMapping("/searchpaginated")
-	public String search(ModelMap model, @RequestParam(name = "name", required = false) String name,
-	        @RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size) {
+	@GetMapping("/searchpaging")
+	public String searchDefault(ModelMap model,
+	        @RequestParam(name = "name", required = false) String name,
+	        @RequestParam(name = "page", defaultValue = "1") int page,
+	        @RequestParam(name = "size", defaultValue = "5") int size) {
 
-	    int currentPage = page.orElse(1);
-	    int pageSize = size.orElse(5);
-
-	    Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
-
+	    Pageable pageable = PageRequest.of(page - 1, size);
 	    Page<Category> categoryPage;
 
 	    if (StringUtils.hasText(name)) {
