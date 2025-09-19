@@ -66,15 +66,14 @@ public class CategoryController {
 	    cateSer.save(category);
 	    String message = cateModel.getEdit() ? "Chỉnh sửa thành công!" : "Lưu thành công!";
 	    model.addAttribute("message", message);
-	    return new ModelAndView("redirect:/admin/categories/searchpaginated");
+	    return new ModelAndView("redirect:/admin/categories");
 	}
 
-	// Trang chỉnh sửa danh mục
-	@GetMapping("edit/{categoryId}")
-	public ModelAndView edit(ModelMap model, @PathVariable("categoryId") Long categoryId) {
-		Optional<Category> optCategory = cateSer.findById(categoryId);
+	@GetMapping("edit")
+	public ModelAndView edit(ModelMap model, @RequestParam("id") Long id) {
+		Optional<Category> optCategory = cateSer.findById(id);
 		CategoryModel cateModel = new CategoryModel();
-
+		
 		if (optCategory.isPresent()) {
 			Category entity = optCategory.get();
 			BeanUtils.copyProperties(entity, cateModel);
@@ -119,8 +118,8 @@ public class CategoryController {
 	    return "admin/categories/searchpaging";
 	}
 
-	@GetMapping("/delete/{id}")
-	public String delete(ModelMap model, @PathVariable("id") Long id) {
+	@GetMapping("/delete")
+	public String delete(ModelMap model, @RequestParam("id") Long id) {
 		cateSer.deleteById(id);
 		model.addAttribute("message", "Category was deleted");
 		return "forward:/admin/categories";

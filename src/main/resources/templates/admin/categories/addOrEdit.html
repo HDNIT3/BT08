@@ -37,6 +37,7 @@
                         <input type="text" class="form-control"
                                th:field="*{name}" id="name" name="name"
                                placeholder="Category Name">
+                        <input type="hidden" th:field="*{edit}">
                         <div th:if="${#fields.hasErrors('name')}" id="nameError" class="form-text text-muted">
                             <span class="text-danger">Category Name is required!</span>
                         </div>
