@@ -49,7 +49,8 @@ public class ProductAPIController {
 			@Validated @RequestParam("quantity") int quantity, @Validated @RequestParam("unitPrice") double unitPrice,
 			@Validated @RequestParam("description") String description,
 			@Validated @RequestParam("discount") double discount, @Validated @RequestParam("status") short status,
-			@RequestParam(value = "image", required = false) MultipartFile image) {
+			@RequestParam(value = "image", required = false) MultipartFile image,
+			@Validated @RequestParam("idCate") long idcate) {
 		Product product = new Product();
 		product.setProductName(productName);
 		product.setQuantity(quantity);
@@ -58,6 +59,7 @@ public class ProductAPIController {
 		product.setDiscount(discount);
 		product.setStatus(status);
 		product.setCreateDate(new Date());
+		product.setCategory(categoryService.findById(idcate).get());
 
 		if (image != null && !image.isEmpty()) {
 			UUID uuid = UUID.randomUUID();
@@ -77,7 +79,7 @@ public class ProductAPIController {
 			@Validated @RequestParam("description") String description,
 			@Validated @RequestParam("discount") double discount, @Validated @RequestParam("status") short status,
 			@RequestParam(value = "image", required = false) MultipartFile image,
-			@RequestParam("idCate") long idcate
+			@Validated @RequestParam("idCate") long idcate
 			) {
 		Optional<Product> optProduct = productService.findById(id);
 		if (optProduct.isEmpty()) {
@@ -92,6 +94,7 @@ public class ProductAPIController {
 		product.setDiscount(discount);
 		product.setStatus(status);
 		product.setCategory(categoryService.findById(idcate).get());
+		
 
 		if (image != null && !image.isEmpty()) {
 			UUID uuid = UUID.randomUUID();

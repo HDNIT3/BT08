@@ -37,7 +37,7 @@ public class Product implements Serializable {
 	private Date createDate;
 	@Column(nullable = false)
 	private short status;
-
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
