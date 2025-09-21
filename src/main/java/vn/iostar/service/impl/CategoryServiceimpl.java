@@ -101,6 +101,11 @@ public class CategoryServiceimpl implements CategoryService{
 	public void deleteAll() {
 		categoryRepository.deleteAll();
 	}
+
+	@Override
+	public Optional<Category> findByName(String categoryName) {
+		return categoryRepository.findByName(categoryName);
+	}
 	
 	
 }
