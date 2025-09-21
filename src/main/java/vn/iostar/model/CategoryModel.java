@@ -10,4 +10,5 @@ public class CategoryModel {
     private Long id;
     private String name;
     private Boolean edit;
+	private String icon;
 }

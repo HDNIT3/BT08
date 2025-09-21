@@ -1,57 +1,75 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout_admin.html}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout_admin.html}">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Add Or Edit Category</title>
+<meta charset="UTF-8">
+<title>Add Or Edit Category</title>
 </head>
 
 <body>
-<section class="row" layout:fragment="content">
-    <div class="col-6 offset-3 mt-4">
+	<section class="row" layout:fragment="content">
+		<div class="col-6 offset-3 mt-4">
 
-        <!-- Form -->
-        <form th:action="@{/admin/categories/saveOrUpdate}" method="POST" th:object="${category}">
-            <div class="card">
-                <div class="card-header">
-                    <h2 th:text="${category.edit} ? 'Edit Category' : 'Add New Category'"></h2>
-                </div>
+			<!-- Form -->
+			<form th:action="@{/admin/categories/saveOrUpdate}" method="POST"
+				th:object="${category}">
+				<div class="card">
+					<div class="card-header">
+						<h2
+							th:text="${category.edit} ? 'Edit Category' : 'Add New Category'"></h2>
+					</div>
 
-                <div class="card-body">
-                    <div class="mb-3" th:if="${category.edit}">
-                        <label for="id" class="form-label">Category ID:</label>
-                        <input type="hidden" th:field="*{edit}">
-                        <input type="text" readonly class="form-control"
-                               th:field="*{id}" id="id" name="id"
-                               placeholder="Category ID">
-                        <div th:if="${#fields.hasErrors('id')}" id="idError" class="form-text text-muted">
-                            <span class="text-danger">Category ID is required!</span>
-                        </div>
-                    </div>
+					<div class="card-body">
+						<div class="mb-3" th:if="${category.edit}">
+							<label for="id" class="form-label">Category ID:</label> <input
+								type="hidden" th:field="*{edit}"> <input type="text"
+								readonly class="form-control" th:field="*{id}" id="id" name="id"
+								placeholder="Category ID">
+							<div th:if="${#fields.hasErrors('id')}" id="idError"
+								class="form-text text-muted">
+								<span class="text-danger">Category ID is required!</span>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="icon" class="form-label">Category Icon:</label> <input
+								type="file" class="form-control" id="icon" name="icon"
+								accept="image/*">
 
-                    <!-- Category Name -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Category Name:</label>
-                        <input type="text" class="form-control"
-                               th:field="*{name}" id="name" name="name"
-                               placeholder="Category Name">
-                        <input type="hidden" th:field="*{edit}">
-                        <div th:if="${#fields.hasErrors('name')}" id="nameError" class="form-text text-muted">
-                            <span class="text-danger">Category Name is required!</span>
-                        </div>
-                    </div>
-                </div>
+							<!-- Hiển thị icon hiện tại nếu đang edit -->
+							<div th:if="${category.icon != null}" class="mt-2">
+								<img th:src="@{'/uploads/' + ${category.icon}}"
+									alt="Category Icon"
+									style="width: 60px; height: 60px; object-fit: cover;">
+							</div>
 
-                <div class="card-footer text-center">
-                    <button type="submit" class="btn btn-success">Save</button>
-                    <a th:href="@{/admin/categories}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </div>
-        </form>
+							<div th:if="${#fields.hasErrors('icon')}" id="iconError"
+								class="form-text text-muted">
+								<span class="text-danger">Category Icon is required!</span>
+							</div>
+						</div>
+						<!-- Category Name -->
+						<div class="mb-3">
+							<label for="name" class="form-label">Category Name:</label> <input
+								type="text" class="form-control" th:field="*{name}" id="name"
+								name="name" placeholder="Category Name"> <input
+								type="hidden" th:field="*{edit}">
+							<div th:if="${#fields.hasErrors('name')}" id="nameError"
+								class="form-text text-muted">
+								<span class="text-danger">Category Name is required!</span>
+							</div>
+						</div>
+					</div>
 
-    </div>
-</section>
+					<div class="card-footer text-center">
+						<button type="submit" class="btn btn-success">Save</button>
+						<a th:href="@{/admin/categories}" class="btn btn-secondary">Cancel</a>
+					</div>
+				</div>
+			</form>
+
+		</div>
+	</section>
 </body>
 </html>
