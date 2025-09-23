@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout_admin.html}">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách danh mục</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        img { width: 50px; }
+        .alert { padding: 10px; margin-top: 10px; display: none; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .btn { padding: 4px 8px; margin-right: 5px; cursor: pointer; }
+        .btn-warning { background-color: #ffc107; border: none; }
+        .btn-danger { background-color: #dc3545; border: none; color: #fff; }
+        .btn-primary { background-color: #007bff; border: none; color: #fff; }
+        .form-group { margin-bottom: 10px; }
+        input { padding: 5px; }
+    </style>
+</head>
+<body>
+<section class="row" layout:fragment="content">
+    <h2>Danh sách danh mục</h2>
+
+    <div id="message" class="alert"></div>
+
+    <!-- Form thêm/sửa -->
+    <div>
+        <h3 id="form-title">Thêm danh mục</h3>
+        <form id="category-form" enctype="multipart/form-data">
+            <input type="hidden" id="categoryId">
+            <div class="form-group">
+                <label>Tên danh mục:</label>
+                <input type="text" id="categoryName" name="categoryName" required>
+            </div>
+            <div class="form-group">
+                <label>Icon:</label>
+                <input type="file" id="icon" name="icon" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Thêm</button>
+            <button type="button" class="btn btn-secondary" id="cancel-btn" style="display:none;">Hủy</button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Icon</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="category-list"></tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        function showMessage(type, msg) {
+            $('#message').removeClass('alert-success alert-danger')
+                         .addClass('alert-' + type)
+                         .text(msg)
+                         .show();
+            setTimeout(() => $('#message').hide(), 3000);
+        }
+
+        function resetForm() {
+            $('#category-form')[0].reset();
+            $('#categoryId').val('');
+            $('#form-title').text('Thêm danh mục');
+            $('#submit-btn').text('Thêm');
+            $('#cancel-btn').hide();
+        }
+
+        function loadCategories() {
+            $.ajax({
+                url: '/api/category',
+                type: 'GET',
+                success: function(res) {
+                    if (res.status) {
+                        const categories = res.body;
+                        $('#category-list').empty();
+                        categories.forEach(cat => {
+                            $('#category-list').append(`
+                                <tr>
+                                    <td>${cat.id}</td>
+                                    <td>${cat.name}</td>
+                                    <td>${cat.icon ? '<img src="/'+cat.icon+'">' : ''}</td>
+                                    <td>
+                                        <button class="btn btn-warning edit-btn" data-id="${cat.id}">Sửa</button>
+                                        <button class="btn btn-danger delete-btn" data-id="${cat.id}">Xóa</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+
+                        // Nút sửa
+                        $('.edit-btn').click(function() {
+                            const id = $(this).data('id');
+                            $.post('/api/category/getCategory', { id: id }, function(r) {
+                                if (r.status) {
+                                    $('#categoryId').val(r.body.id);
+                                    $('#categoryName').val(r.body.name);
+                                    $('#form-title').text('Sửa danh mục');
+                                    $('#submit-btn').text('Cập nhật');
+                                    $('#cancel-btn').show();
+                                } else {
+                                    showMessage('danger', r.message);
+                                }
+                            });
+                        });
+
+                        // Nút xóa
+                        $('.delete-btn').click(function() {
+                            const id = $(this).data('id');
+                            if (confirm('Bạn có chắc muốn xóa danh mục này?')) {
+                                $.ajax({
+                                    url: '/api/category/deleteCategory?categoryId=' + id,
+                                    type: 'DELETE',
+                                    success: function(r) {
+                                        showMessage(r.status ? 'success' : 'danger', r.message);
+                                        if (r.status) loadCategories();
+                                    },
+                                    error: function() {
+                                        showMessage('danger', 'Đã xảy ra lỗi khi xóa danh mục');
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        showMessage('danger', res.message);
+                    }
+                },
+                error: function() {
+                    showMessage('danger', 'Không thể tải danh sách danh mục');
+                }
+            });
+        }
+
+        // Submit form thêm/sửa
+        $('#category-form').submit(function(e) {
+            e.preventDefault();
+            const categoryId = $('#categoryId').val();
+            const categoryName = $('#categoryName').val();
+            const icon = $('#icon')[0].files[0];
+
+            const formData = new FormData();
+            formData.append('categoryName', categoryName);
+            if (icon) formData.append('icon', icon);
+            if (categoryId) formData.append('categoryId', categoryId);
+
+            const url = categoryId ? '/api/category/updateCategory' : '/api/category/addCategory';
+            const method = categoryId ? 'PUT' : 'POST';  // dùng PUT nếu update
+
+            $.ajax({
+                url: url,
+                type: method,
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(res) {
+                    showMessage(res.status ? 'success' : 'danger', res.message);
+                    if (res.status) {
+                        resetForm();
+                        loadCategories();
+                    }
+                },
+                error: function(xhr) {
+                    let msg = 'Đã xảy ra lỗi';
+                    if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                    showMessage('danger', msg);
+                }
+            });
+        });
+
+        $('#cancel-btn').click(resetForm);
+
+        // Load danh sách lần đầu
+        loadCategories();
+    });
+    </script>
+</section>
+</body>
+</html>

@@ -28,7 +28,7 @@ public class CategoryAPIController {
 	private CategoryService categoryService;
 	@Autowired
 	IStorageService storageService;
-
+	
 	@GetMapping
 	public ResponseEntity<?> getAllCategory() {
 		return new ResponseEntity<Response>(new Response(true, "Thành công", categoryService.findAll()), HttpStatus.OK);

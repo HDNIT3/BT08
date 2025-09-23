@@ -38,6 +38,11 @@ public class CategoryController {
 		model.addAttribute("categories", cateSer.findAll());
 		return "admin/list";
 	}
+	
+	@GetMapping("/lists")
+	public String lists() {
+		return "admin/categories/IJAXAPI";
+	}
 
 	// Trang thêm mới danh mục
 	@GetMapping("add")
